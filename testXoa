@@ -1,0 +1,147 @@
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <mylib.h>
+#include<string.h>
+#include<conio.h>
+
+using namespace std;
+struct Docgia
+{
+	int mathe,trangthai3,phai;
+	char ho[40],ten[10];
+	Docgia *dangmuon;
+};
+struct nodeDg
+{
+   int key;	
+   Docgia dg;
+   struct nodeDg *left;
+   struct nodeDg *right;
+};
+typedef nodeDg *PTR3;
+void Insert_node(PTR3 &p, int mathe, char *ten, int trangthai3, int phai)
+{
+	if (p==NULL)
+	{
+		p = new nodeDg;
+		p->key=mathe;
+		strcpy(p->dg.ten,ten);
+		p->dg.mathe=mathe;
+		p->dg.phai=phai;
+		p->left=NULL;
+		p->right=NULL;
+	}
+	else if (mathe<p->key)
+		Insert_node (p->left,mathe,ten,trangthai3,phai);
+	else if (mathe>p->key)
+		Insert_node (p->right,mathe,ten,trangthai3,phai);
+	delete[] ten;
+	ten=NULL;
+}
+void Nhap(PTR3 &p)
+{
+	Insert_node(p, 20, "Van A", 1, 1);
+	Insert_node(p, 1, "Van B", 1, 1);
+	Insert_node(p, 15, "Thi C", 1, 0);
+	Insert_node(p, 30, "Thi D", 1, 0);
+}
+void XuatDocgia(PTR3 &p)
+{
+	cout << "Ho va ten: "<< p->dg.ten;
+	cout << "\nGioi tinh: ";
+	if (p->dg.phai==1)	
+		cout << "Nam";
+	else if(p->dg.phai==0)
+		cout << "Nu"; 
+	cout<< "\nMa the: "<< p->key << endl;
+}
+PTR3 rp;
+void remove_case_3 (PTR3 &r)
+{
+  	if (r->left != NULL)
+     	remove_case_3 (r->left);
+   //den day r la nut cuc trai cua cay con ben phai co nut goc la rp}
+    else 
+	{
+   		rp->key = r->key;  	//Chep noi dung cua r sang rp ";
+   		strcpy(rp->dg.ten,r->dg.ten);
+		rp->dg.mathe=r->dg.mathe;
+		rp->dg.phai=r->dg.phai;	
+		rp->dg.trangthai3=r->dg.trangthai3;	//  de lat nua free(rp)
+   		rp = r;           	
+   		r = rp->right;
+	}
+}
+void remove (int x, PTR3 &p)
+{
+	if (p == NULL)  printf ("Khong tim thay");
+	else if (x < p->key)   
+		remove (x, p->left);
+	else if (x > p->key)
+		remove (x, p->right);
+	else   	// p->key = x
+	{
+		rp = p;
+        if (rp->right == NULL)  
+			p = rp->left;   
+	// p là nút lá hoac la nut chi co cay con ben trai
+		else if (rp->left == NULL)
+			p = rp->right;  // p là nut co cay con ben phai
+		else remove_case_3 (rp->right);
+		delete rp;
+	}
+}
+
+void Xoa(PTR3 &p, char *nhap)
+{
+	if (strcmp(p->dg.ten,nhap)==0)
+		cout << "Xoa "<<p->dg.ten;
+	remove (p->dg.mathe,p);
+	cout << endl;
+}
+void Inorder (PTR3 &p,int dk,char *nhap)
+{
+	if (p != NULL)
+	{
+		Inorder(p->left,dk,nhap);
+		if (dk==0)
+			XuatDocgia(p);
+		else if(dk==1)
+			Xoa(p, nhap);
+		Inorder(p->right,dk,nhap);
+	}
+}
+int main()
+{
+	PTR3 p=NULL;
+	char *nhap=NULL;
+	nhap=new char[20];
+	Nhap(p);
+	Inorder (p,0,nhap);
+	cout <<"Nhap ten can xoa: ";
+	cin.getline(nhap,20);
+	Inorder (p,1,nhap);
+	delete[] nhap;
+	nhap=NULL;
+	Inorder (p,0,nhap);
+/*	char ten[20]="Van";
+	char *nhap;
+	nhap=new char[30];
+	cin.getline(nhap,20);
+	for (int i=0;i<strlen(nhap);i++)
+		cout << nhap[i];
+	cout <<"\n"<<strcmp(ten,nhap);
+	delete[] nhap;*/
+/*	char ten[20]="hi";
+	char *nhap;
+	nhap= new char[20];
+	nhap="Xin chap";
+	for (int i=0;i<strlen(nhap);i++)
+		cout<< nhap[i];
+	strcpy(ten,nhap);
+	cout << "\n"<< ten;
+	delete []nhap;*/
+}
