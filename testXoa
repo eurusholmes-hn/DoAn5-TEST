@@ -38,15 +38,25 @@ void Insert_node(PTR3 &p, int mathe, char *ten, int trangthai3, int phai)
 		Insert_node (p->left,mathe,ten,trangthai3,phai);
 	else if (mathe>p->key)
 		Insert_node (p->right,mathe,ten,trangthai3,phai);
-	delete[] ten;
-	ten=NULL;
 }
 void Nhap(PTR3 &p)
 {
-	Insert_node(p, 20, "Van A", 1, 1);
-	Insert_node(p, 1, "Van B", 1, 1);
-	Insert_node(p, 15, "Thi C", 1, 0);
-	Insert_node(p, 30, "Thi D", 1, 0);
+	char *ten=NULL;
+	ten= new char[20];
+	char a[]="Van A";
+	char b[]="Van B";
+	char c[]="Thi C";
+	char d[]="Thi D";
+	strcpy(ten,a);
+	Insert_node(p, 20, ten, 1, 1);
+	strcpy(ten,b);
+	Insert_node(p, 1, ten, 1, 1);
+	strcpy(ten,c);
+	Insert_node(p, 15, ten, 1, 0);
+	strcpy(ten,d);
+	Insert_node(p, 30, ten, 1, 0);
+	delete[] ten;
+	ten=NULL;
 }
 void XuatDocgia(PTR3 &p)
 {
@@ -58,7 +68,7 @@ void XuatDocgia(PTR3 &p)
 		cout << "Nu"; 
 	cout<< "\nMa the: "<< p->key << endl;
 }
-PTR3 rp;
+PTR3 rp=NULL;
 void remove_case_3 (PTR3 &r)
 {
   	if (r->left != NULL)
@@ -77,7 +87,7 @@ void remove_case_3 (PTR3 &r)
 }
 void remove (int x, PTR3 &p)
 {
-	if (p == NULL)  printf ("Khong tim thay");
+	if (p == NULL)  cout << ("Khong tim thay");
 	else if (x < p->key)   
 		remove (x, p->left);
 	else if (x > p->key)
@@ -95,46 +105,87 @@ void remove (int x, PTR3 &p)
 	}
 }
 
-void Xoa(PTR3 &p, char *nhap)
-{
-	if (strcmp(p->dg.ten,nhap)==0)
-		cout << "Xoa "<<p->dg.ten;
-	remove (p->dg.mathe,p);
-	cout << endl;
-}
-void Inorder (PTR3 &p,int dk,char *nhap)
-{
+void DuyetXuat (PTR3 &p)	//Inorder de qui
+{	
 	if (p != NULL)
 	{
-		Inorder(p->left,dk,nhap);
-		if (dk==0)
-			XuatDocgia(p);
-		else if(dk==1)
-			Xoa(p, nhap);
-		Inorder(p->right,dk,nhap);
+		DuyetXuat(p->left);
+		XuatDocgia(p);
+		DuyetXuat(p->right);
 	}
 }
+int CheckXoa (PTR3 p,char *nhap)
+{
+	if (strcmp(p->dg.ten,nhap)==0)
+		return p->dg.mathe;
+	else return 0;
+}
+int DuyetXoa(PTR3 root, char *nhap) 	//Inorder khong de qui
+{   
+	int check=0;
+	const int STACKSIZE = 500;
+   	PTR3 Stack[STACKSIZE];
+   	PTR3 p=root;
+   	int sp=-1;	 // Khoi tao Stack rong
+   	do
+   	{ 
+	   	while (p != NULL)
+      	{	 
+		  	Stack[++sp]= p;
+	 		p= p->left;
+      	}
+      	if (sp != -1)
+      	{	 
+		  	p=Stack[sp--];
+	 		check=CheckXoa (p, nhap);
+	 		if (check!=0)
+	 			return check;
+	 		p=p->right;
+      	}
+      	else break;
+   	}while (1);
+}
+
+/*NODEPTR Search (NODEPTR root, int x)
+{
+   	NODEPTR p;
+   	p = root;
+   	while (p != NULL && p->key !=x)
+    if(x < p->key)
+        p = p->left;
+    else
+        p = p->right;
+	return(p); 
+}*/	
 int main()
 {
+	int check=0;
+	int tam,x=0;
 	PTR3 p=NULL;
 	char *nhap=NULL;
 	nhap=new char[20];
 	Nhap(p);
-	Inorder (p,0,nhap);
-	cout <<"Nhap ten can xoa: ";
+	DuyetXuat (p);
+	cout <<endl;
 	cin.getline(nhap,20);
-	Inorder (p,1,nhap);
+	check=DuyetXoa (p, nhap);
+	if (check!=0)
+		remove(check,p);
+	cout <<endl;
+	DuyetXuat (p);
 	delete[] nhap;
 	nhap=NULL;
-	Inorder (p,0,nhap);
-/*	char ten[20]="Van";
+	delete p;
+	p=NULL;
+/*	Inorder (p,0,nhap);
+	char ten[20]="Van A";
 	char *nhap;
 	nhap=new char[30];
 	cin.getline(nhap,20);
 	for (int i=0;i<strlen(nhap);i++)
 		cout << nhap[i];
 	cout <<"\n"<<strcmp(ten,nhap);
-	delete[] nhap;*/
+	delete[] nhap;
 /*	char ten[20]="hi";
 	char *nhap;
 	nhap= new char[20];
