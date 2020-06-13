@@ -1,0 +1,368 @@
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <mylib.h>
+#include<string.h>
+#include<conio.h>
+
+#define UP 72
+#define DOWN 80
+#define BACKSPACE 8
+#define ENTER 13
+#define ESC 27
+#define RIGHT 77
+#define LEFT 75
+#define SPACE 32
+#define F1 59
+#define F2 60
+#define F3 61
+#define F4 62
+
+
+#define ArrowRIGHT 27
+#define ArrowLEFT 26
+#define ArrowUP 25
+#define ArrowDOWN 24
+using namespace std;
+const int so_item = 3;
+const int so_itemDg = 4;
+const int so_itemIn = 3;
+const int dong =5;
+const int cot = 20 ;
+const int minN = 1;
+const int maxN = 100;
+char menuNgoai[so_item][50]={"1. Hieu chinh the doc gia     ",
+							 "2. In danh sach doc gia     ",
+			                 "3. Ket thuc chuong trinh    "};
+char menuDocgia[so_itemDg][50]={"1. Them doc gia     ",
+								"2. Chinh sua doc gia     ",
+								"3. Xoa doc gia    ",
+			                   	"4. Quay lai    "};
+char menuGioitinh[so_item][50]= {" Nam ",
+			                   	 " Nu "};
+char menuIn[so_itemIn][50]={"1. In theo thu tu ten tang dan   ",
+							"2. In theo thu tu ma doc gia tang dan    ",
+			                "3. Quay lai   "};
+struct Muontra
+{
+	int MASACH,muon,tra,trangthai2;
+};
+struct nodeMt
+{  
+    Muontra mt;
+    struct nodeMt *left, *right;
+};
+typedef  nodeMt *PTR2;
+struct Docgia
+{
+	int mathe,trangthai3,phai;
+	char ho[40],ten[10];
+	Muontra *dangmuon;
+};
+struct nodeDg
+{
+   int key;	
+   Docgia dg;
+   struct nodeDg *left;
+   struct nodeDg *right;
+};
+typedef nodeDg *PTR3;
+bool Hople(char nhap,int x,int y)
+{
+	if (((nhap>64) && (nhap<91)) || ((nhap>96) && (nhap<123)) || (nhap==32) || (nhap==13))
+		return true;
+	gotoxy(10,30);
+	cout << "KI TU KHONG HOP LE!!!";
+	Sleep(1000);
+	cout << "                     ";
+	gotoxy(x,y);
+	return false;
+}
+void NhapTen(char kitu, char *ten, int &dau,int &cuoi,int vitri)
+{
+	if (kitu!=ENTER)
+	{
+		cout << kitu;
+		*(ten+(vitri-dau))=kitu;
+		if ((vitri-dau)>cuoi)
+			cuoi=vitri-dau;
+	}
+}
+void NhapMuiTen(char kitu, char *ten, int &dau,int vitri)
+{
+	if ((kitu==75)||(kitu==77))
+	{
+		if (ten[vitri-dau]=='\0')
+			ten[vitri-dau]=SPACE;
+	}
+}
+void XoaChu(char *ten,int dau, int &cuoi,int vitri)
+{
+	if (vitri-1>=dau)
+	{
+		gotoxy(vitri-1,wherey());
+		cout << ' ';
+		gotoxy(vitri-1,wherey());
+		*(ten+(vitri-1-dau))=32;
+		if ((vitri-1-dau)==cuoi)
+			cuoi--;
+	}
+}
+void kituhoa(char *ten,int &cuoi)
+{
+    int i=0;
+    if (ten[0] != 32)
+    {
+        if ((ten[0] >96) && (ten[0]< 123))
+		{
+			ten[0] -= 32;
+        }
+    }
+    for (i = 0; i <= cuoi; i++)
+	{
+        if ((ten[i] == 32)||(ten[i]=='\0'))
+        {
+            if ((ten[i + 1]> 96) && (ten[i + 1] < 123))
+            {
+    			ten[i + 1] -= 32;
+            }
+        }
+    }
+}
+int xoa(char *a, int q)
+{
+    int n = strlen(a), i;
+    for (i = q; i <= n; i++)
+    {
+        a[i] = a[i + 1];
+    }
+    n--;
+    return 0;
+}
+int xoakhoangtrang(char *a)
+{
+    int i, n=strlen(a);
+    for (i = 0; i < n; i++)
+    {
+        if (a[0] == 32)
+        {
+            xoa(a, 0);
+            n--;
+        }
+        	if (a[n-1] == 32)
+            {
+                xoa(a, n-1);
+                n--;
+            }
+            if (a[i] == 32 && a[i + 1] == 32)
+            {
+                xoa(a, i);
+                i--;
+                n--;
+        	}
+    }
+    return 0;
+}
+void XuatTen(char *ten,int &cuoi)
+{
+	for (int i=0;i<=cuoi+1;i++)
+	{
+		cout << ten[i];
+	}
+}
+void XuatTen2(char *ten)
+{
+	int n=strlen(ten);
+	for (int i=0;i<=n;i++)
+		cout <<ten[i];
+}
+int main()
+{
+	bool hl=false;
+	char kitu;
+	int cuoi=0;
+	int x=wherex();
+	int y=wherey();
+	char *ten=NULL;
+	ten = new char[20];
+	for (int y=0; y<=20; y++)
+		ten[y]='\0';
+	do
+	{
+		kitu=getch();
+		switch (kitu)
+		{
+			case ENTER:
+			{
+				ten[cuoi+1]='\0';
+				cout<<endl;
+				kituhoa(ten, cuoi);
+				xoakhoangtrang(ten);
+				//XuatTen(ten,cuoi);
+				XuatTen2(ten);
+				delete[] ten;
+				ten=NULL;
+			}
+			case BACKSPACE:
+			{
+				XoaChu(ten,x,cuoi,wherex());
+				break;
+			}
+			case 75:
+			{
+				NhapTen(kitu,ten, x,cuoi,wherex());	
+				break;
+			}
+			case 77:
+			{
+				NhapTen(kitu,ten, x,cuoi,wherex());	
+				break;
+			}
+			case -32:
+			{
+				kitu =getch();
+				if (kitu==LEFT)
+				{
+					if (wherex()>x)
+					{	
+						NhapMuiTen(kitu, ten, x, wherex());
+						gotoxy(wherex()-1,wherey());
+					}
+					break;
+				}
+				if (kitu==RIGHT)
+				{
+					NhapMuiTen(kitu, ten, x, wherex());
+					gotoxy(wherex()+1,wherey());
+					break;
+				}
+				if (kitu==UP)
+				{
+					break;
+				}
+				if (kitu==DOWN)
+				{
+					break;
+				}
+			}
+			case ESC:
+				return 0;
+			default:
+			{ 
+				hl=Hople(kitu,wherex(),wherey());
+				if (hl==true)
+					NhapTen(kitu,ten, x,cuoi,wherex());
+				break;
+			}
+		}
+	}while(1);
+}
+
+/*int DienTen(PTR3 &p, int *mangtam,char *ten) 
+{
+	fflush(stdin);
+	Normal();
+	system("cls");
+	ten= new char[20];
+
+	int mathe=0;
+	bool tran=false;
+	char kitu;
+	bool checkten=true;
+
+	int cuoi=0,i=0;
+	cout << "Nhap ho va ten: ";
+	int x=wherex(),y=wherey();
+	cout<< "\nGioi tinh: ";
+	gotoxy(x,y);
+	for (int i=0;i<20;i++)
+		ten[i]='\0';
+	do
+	{
+		kitu=getch();
+		switch (kitu)
+		{
+			case ENTER:
+			{
+				NhapTen('\0',ten, x,cuoi,wherex());
+				gotoxy (x,y+1);
+				checkten=CheckTen(ten,x,y,cuoi);
+				if (checkten==true)
+			 	{
+				 	kituhoa(ten,cuoi);
+			 		gotoxy(x,y);
+					XuatTen(ten,cuoi);
+					gotoxy(x-5,y+1);
+					int gt=Gioitinh(menuGioitinh,wherex(),wherey());
+					if (gt==-1)
+						return 0;
+					else if (gt==-2)
+					{
+						gotoxy(x,y);
+						break;
+					}
+					gotoxy(0,2);
+					mathe=RandomSo(mathe,minN,maxN,mangtam,tran);
+					cout << "Ma the cua ban la: " << mathe;
+					gotoxy(10,20);
+					SetColor(15);
+					SetBGColor(4);
+					cout << " THEM DOC GIA THANH CONG! ";
+					Sleep(1500);
+					gotoxy(10,20);
+					SetColor(15);
+					SetBGColor(0);
+					cout<< "                                ";
+					Insert_node(p, mathe, ten, 1, gt);
+					delete ten;
+					ten=NULL;
+					return 1;
+				}
+				else 
+				{
+					gotoxy(x,y);
+					break;
+				}
+			}
+			case BACKSPACE:
+			{
+				XoaChu(ten,x,cuoi,wherex());
+				break;
+			}
+			case -32:
+			{
+				kitu =getch();
+				if (kitu==75)
+				{
+					if (wherex()>x)
+					{	
+						gotoxy(wherex()-1,wherey());
+					}
+					break;
+				}
+				if (kitu==77)
+				{
+					gotoxy(wherex()+1,wherey());
+					break;
+				}
+				if (kitu==72)
+				{
+					break;
+				}
+				if (kitu==80)
+				{
+					break;
+				}
+			}
+			case ESC:
+				return 0;
+			default:
+			{ 
+				NhapTen(kitu,ten, x,cuoi,wherex());
+				break;
+			}
+		}
+	}while(1);
+}*/
