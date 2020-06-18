@@ -1,0 +1,681 @@
+// Sua phan Truyen Ten va Truyen HO
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <mylib.h>
+#include<string.h>
+#include<conio.h>
+#include<cstring>
+
+#define UP 72
+#define DOWN 80
+#define BACKSPACE 8
+#define ENTER 13
+#define ESC 27
+#define RIGHT 77
+#define LEFT 75
+#define SPACE 32
+#define F1 59
+#define F2 60
+#define F3 61
+#define F4 62
+
+#define ArrowRIGHT 27
+#define ArrowLEFT 26
+#define ArrowUP 25
+#define ArrowDOWN 24
+
+using namespace std;
+const int LeTren = 0;
+const int LeDuoi = 30;
+const int LeTrai = 1;
+const int LePhai = 130;
+const int LeGiuaDoc = 50;
+const int LeGiuaNgang = 14;
+const int so_item = 3;
+const int so_itemDg = 4;
+const int so_itemIn = 3;
+const int dong =5;
+const int cot = 20 ;
+const int minN = 1;
+const int maxN = 3000;
+char menuNgoai[so_item][50]={"1. Hieu chinh the doc gia     ",
+							 "2. In danh sach doc gia     ",
+			                 "3. Ket thuc chuong trinh    "};
+char menuDocgia[so_itemDg][50]={"1. Them doc gia     ",
+								"2. Chinh sua doc gia     ",
+								"3. Xoa doc gia    ",
+			                   	"4. Quay lai    "};
+char menuGioitinh[so_item][50]= {" Nam ",
+			                   	 " Nu "};
+char menuIn[so_itemIn][50]={"1. In theo thu tu ten tang dan   ",
+							"2. In theo thu tu ma doc gia tang dan    ",
+			                "3. Quay lai   "};
+struct Muontra
+{
+	int MASACH,muon,tra,trangthai2;
+};
+struct nodeMt
+{  
+    Muontra mt;
+    struct nodeMt *left, *right;
+};
+typedef  nodeMt *PTR2;
+struct Docgia
+{
+	int mathe,trangthai3,phai;
+	char ho[40],ten[10];
+	Muontra *dangmuon;
+};
+struct nodeDg
+{
+   int key;	
+   Docgia dg;
+   struct nodeDg *left;
+   struct nodeDg *right;
+};
+typedef nodeDg *PTR3;
+void Normal () {
+	SetColor(15);
+	SetBGColor(0);
+}
+void HighLight () {
+	SetColor(15);
+	SetBGColor(1);
+}
+int MenuNgoai(char mN [][50],int so)
+{
+	Normal();
+  	system("cls");   
+  	if (so==2)
+	{
+		gotoxy(cot+2,dong-2);
+		SetColor(4);
+		cout << "   QUAN LY THU VIEN   ";
+	}
+	Normal();
+	int chon =0;
+  	for (int i=0; i< so ; i++)
+  	{ 
+	  	gotoxy(cot, dong +i);
+    	cout << mN[i];
+  	}	
+  	HighLight();
+  	gotoxy(cot,dong+chon);
+  	cout << mN[chon];
+  	char kytu;
+	do 
+	{
+  		kytu = getch();
+  		if (kytu==0) 
+		  	kytu = getch();
+  		switch (kytu) 
+		{
+    		case UP:
+				if (chon+1 >1)
+  				{
+  		        	Normal();
+              		gotoxy(cot,dong+chon);
+              		cout << mN[chon];
+              		chon --;
+              		HighLight();
+              		gotoxy(cot,dong+chon);
+              		cout << mN[chon];
+  				}
+  			  	break;
+  			case DOWN:
+			  	if (chon+1 <so)
+  			  	{
+  		        	Normal();
+              		gotoxy(cot,dong+chon);
+              		cout << mN[chon];
+              		chon ++;
+              		HighLight();
+              		gotoxy(cot,dong+chon);
+              		cout << mN[chon];
+  				}
+  			  	break;
+  			case ESC: return 0;
+  			case 13 : return chon+1;
+  		}		  // end switch
+  	} while (1);
+}
+int MenuGioitinh(char mGt [so_item][50],int &vtx,int &vty)
+{
+	Normal();
+	int chon =0;
+  	for (int i=0; i< so_item; i++)
+  	{ 
+	  	gotoxy(vtx+i*5, vty);
+    	cout << mGt[i];
+  	}	
+  	HighLight();
+  	gotoxy(vtx,vty);
+  	cout << mGt[chon];
+  	char kytu;
+	do 
+	{
+  		kytu = getch();
+  		if (kytu==0) 
+		  	kytu = getch();
+  		switch (kytu) 
+		{
+    		case LEFT:
+				if (chon+1 >1)
+  				{
+  		        	Normal();
+              		gotoxy(vtx+chon*5,vty);
+              		cout << mGt[chon];
+              		chon --;
+              		HighLight();
+              		gotoxy(vtx+chon*5,vty);
+              		cout << mGt[chon];
+  				}
+  			  	break;
+  			case RIGHT:
+			  	if (chon+1 <2)
+  			  	{
+  		        	Normal();
+              		gotoxy(vtx+chon*5,vty);
+              		cout << mGt[chon];
+              		chon ++;
+              		HighLight();
+              		gotoxy(vtx+chon*5,vty);
+              		cout << mGt[chon];
+  				}
+  			  	break;
+  			case UP:
+  				return -2;
+  			case ESC: return 0;
+  			case 13 : return chon+1;
+  		}		  // end switch
+  	} while (1);
+}
+int Gioitinh(char mGt [so_item][50],int vtx,int vty)
+{
+	int gt= MenuGioitinh(mGt,vtx,vty);
+	gotoxy(vtx, vty);
+	Normal();
+	if (gt==1)
+		{
+			cout << " Nam                ";
+			return 1;
+		}
+	else if(gt==2)
+		{
+			cout << " Nu                 ";
+			return 0;
+		}
+	else if(gt==0)
+		{
+			return -1;
+		}
+	else if(gt==-2)
+		{
+			return -2;
+		}
+}
+void Insert_node(PTR3 &p, int mathe, char *ho, char *ten, int trangthai3, int phai)
+{
+	if (p==NULL)
+	{
+		p = new nodeDg;
+		p->key=mathe;
+		strcpy(p->dg.ho,ho);
+		strcpy(p->dg.ten,ten);
+		p->dg.mathe=mathe;
+		p->dg.phai=phai;
+		p->left=NULL;
+		p->right=NULL;
+	}
+	else if (mathe<p->key)
+		Insert_node (p->left,mathe,ho, ten,trangthai3,phai);
+	else if (mathe>p->key)
+		Insert_node (p->right,mathe,ho, ten,trangthai3,phai);
+}
+void XuatDocgia(PTR3 &p)
+{
+	cout << "Ho va ten: "<< p->dg.ho <<" "<< p->dg.ten;
+	cout << "\nGioi tinh: ";
+	if (p->dg.phai==1)	
+		cout << "Nam";
+	else if(p->dg.phai==0)
+		cout << "Nu"; 
+	cout<< "\nMa the: "<< p->key << endl;
+}
+void Inorder (PTR3 &p)
+{
+	if (p != NULL)
+	{
+		Inorder(p->left);
+		XuatDocgia(p);
+		Inorder(p->right);
+	}
+}
+/*void GhiFile(int x, char ten[])
+{
+	fstream f;
+	f.open(("testfile.txt"), ios::app);
+	f << ten;
+	f << x;
+}*/
+int Matrung(int &mathe)
+{
+	fstream f;
+	f.open("Mathe.txt",ios::in);
+	int data;
+	while (!f.eof())
+	{
+		f>>data;
+		if (mathe==data)
+		{
+			f.close();
+			return 1;
+		}
+	}
+	f.close();
+	f.open("Mathe.txt",ios::app);
+	f << '\n';
+	f << mathe;
+	f.close();
+	return 0;
+}
+int RandomSo(int &mathe,int minN,int maxN, int &flag)
+{
+	srand((int)time(0));
+    int check=0;
+    do 
+    {
+    	mathe = minN + rand() % (maxN + 1 - minN);
+    	check = Matrung(mathe);
+	}while(check==1);
+	return mathe;
+}
+int CheckTran()
+{
+	fstream f;
+	int data;
+	int flag=0;
+	f.open("Mathe.txt",ios::in);
+	while (!f.eof())
+	{
+		f >> data;
+		flag++;
+	}
+	f.close();
+	return flag;
+}
+int SinhMathe()
+{
+	int mt=0;
+	int flag=0;
+	do
+	{
+		flag=CheckTran();
+		if (flag<maxN)
+		{
+			mt= RandomSo(mt, minN, maxN, flag);
+			return mt;
+		}
+		else return 0;
+	}
+	while (mt != 0);
+}
+void XoaChu(char *nhap,int dau, int &cuoi,int vitri)
+{
+	if (vitri-1>=dau)
+	{
+		gotoxy(vitri-1,wherey());
+		cout << ' ';
+		gotoxy(vitri-1,wherey());
+		*(nhap+(vitri-1-dau))=32;
+		if ((vitri-1-dau)==cuoi)
+			cuoi--;
+	}
+}
+bool CheckTen(char *nhap,int x,int y,int &cuoi)
+{
+	bool rong=true;
+	for (int i=0;i<=cuoi;i++)
+	{	
+		if ((nhap[i]!='\0')&&(nhap[i]!=32))
+			{
+				rong=false;
+				break;
+			}				
+	}
+	if (rong==true)
+	{
+		gotoxy(10,20);
+		SetColor(4);
+		cout << "XIN HAY NHAP TEN! ";
+		Sleep(1500);
+		gotoxy(10,20);
+		cout<< "                                ";
+		gotoxy(x,y);
+		SetColor(15);
+		return false;	
+	}
+	return true;
+}
+void NhapMuiTen(char kitu, char *nhap, int &dau,int vitri)
+{
+	if ((kitu==75)||(kitu==77))
+	{
+		if (nhap[vitri-dau]=='\0')
+			nhap[vitri-dau]=SPACE;
+	}
+}
+void kituhoa(char *nhap,int &cuoi)
+{
+    int i=0;
+    if (nhap[0] != 32)
+    {
+        if ((nhap[0] >96) && (nhap[0]< 123))
+		{
+			nhap[0] -= 32;
+        }
+    }
+    for (i = 0; i <= cuoi; i++)
+	{
+        if ((nhap[i] == 32)||(nhap[i]=='\0'))
+        {
+            if ((nhap[i + 1]> 96) && (nhap[i + 1] < 123))
+            {
+    			nhap[i + 1] -= 32;
+            }
+        }
+    }
+}
+int xoa(char *a, int q)
+{
+    int n = strlen(a), i;
+    for (i = q; i <= n; i++)
+    {
+        a[i] = a[i + 1];
+    }
+    n--;
+    return 0;
+}
+int xoakhoangtrang(char *a)
+{
+    int i, n=strlen(a);
+    for (i = 0; i < n; i++)
+    {
+        if (a[0] == 32)
+        {
+            xoa(a, 0);
+            n--;
+        }
+        	if (a[n-1] == 32)
+            {
+                xoa(a, n-1);
+                n--;
+            }
+            if (a[i] == 32 && a[i + 1] == 32)
+            {
+                xoa(a, i);
+                i--;
+                n--;
+        	}
+    }
+    return 0;
+}
+bool Hople(char nhap,int x,int y)
+{
+	if (((nhap>64) && (nhap<91)) || ((nhap>96) && (nhap<123)) || (nhap==32) || (nhap==13))
+		return true;
+	gotoxy(10,30);
+	cout << "KI TU KHONG HOP LE!!!";
+	Sleep(1000);
+	cout << "                     ";
+	gotoxy(x,y);
+	return false;
+}
+char* TruyenTen(char *nhap, int cuoi,char *ten)
+{
+	char *tam=NULL;
+	tam = new char[20];
+	int j=0;
+	tam[j]= '\0';
+	j=j+1;
+	for (int i=strlen(nhap)-1; nhap[i]!=32; i--)
+	{
+	//	cout << "Nhap HO";
+		tam[j]=nhap[i];
+		j++;
+	}
+	tam[j]= '\0';
+	tam=strrev(tam);
+	strcpy(ten,tam);
+	delete[] tam;
+	tam=NULL;
+	return ten;
+}
+char* TruyenHo(char *nhap,char *ho)
+{
+	int i=0, j=0;
+	char *tam=NULL;
+	tam = new char[20];
+	for (i; i<strlen(nhap); i++)
+	{
+	//	cout << "Nhap HO";
+		tam[j]=nhap[i];
+		j++;
+	}
+	tam[j]= '\0';
+	strcpy(ho, tam);
+	delete[] tam;
+	tam=NULL;
+	return ho;
+}
+void NhapTen(char kitu, char *nhap, int &dau,int &cuoi,int vitri)
+{
+	if (kitu!=ENTER)
+	{
+		cout << kitu;
+		*(nhap+(vitri-dau))=kitu;
+		if ((vitri-dau)>cuoi)
+			cuoi=vitri-dau;
+	}
+}
+void XuatTen(char *nhap)
+{
+	int n=strlen(nhap);
+	for (int i=0;i<=n;i++)
+		cout <<nhap[i];
+}
+int DienTen(PTR3 &p,char *nhap) 
+{
+	fflush(stdin);
+	Normal();
+	system("cls");
+	nhap= new char[40];
+	char *ho=NULL, *ten=NULL;
+	ho = new char[30];
+	ten = new char[10];
+	int mathe=0;
+	char kitu;
+	bool checkten=true;
+	bool hl=false;
+	int cuoi=0,i=0;
+	cout << "Nhap ho va ten: ";
+	int x=wherex(),y=wherey();
+	cout<< "\nGioi tinh: ";
+	gotoxy(x,y);
+	for (int y=0;y<=20;y++)
+		nhap[y]='\0';
+	do
+	{
+		kitu=getch();
+		switch (kitu)
+		{
+			case ENTER:
+			{
+				gotoxy (x,y+1);
+				nhap[cuoi+1]='\0';
+				checkten=CheckTen(nhap,x,y,cuoi);
+				if (checkten==true)
+			 	{
+				 	kituhoa(nhap, cuoi);
+					xoakhoangtrang(nhap);
+			 		gotoxy(x,y);
+			 		cout << "                                          ";
+			 		gotoxy(x,y);
+					XuatTen(nhap);
+					gotoxy(x-5,y+1);
+					int gt=Gioitinh(menuGioitinh,wherex(),wherey());
+					if (gt==-1)
+						return 0;
+					else if (gt==-2)
+					{
+						gotoxy(x,y);
+						break;
+					}
+					gotoxy(0,2);
+					mathe=SinhMathe();
+					if (mathe!=0)
+					{
+						cout << "Ma the cua ban la: " << mathe;
+						gotoxy(10,20);
+						SetColor(15);
+						SetBGColor(4);
+						cout << " THEM DOC GIA THANH CONG! ";
+						Sleep(1500);
+						gotoxy(10,20);
+						SetColor(15);
+						SetBGColor(0);
+						cout<< "                                ";
+						ten=TruyenTen(nhap, cuoi, ten);
+						ho=TruyenHo(nhap,ho);
+						Insert_node(p, mathe, ho, ten, 1, gt);
+						delete[] nhap;
+						nhap=NULL;
+						delete[] ho;
+						ho=NULL;
+						delete[] ten;
+						ten=NULL;
+						return 1;
+					}
+				}
+				else 
+				{
+					gotoxy(x,y);
+					break;
+				}
+			}
+			case BACKSPACE:
+			{
+				XoaChu(nhap,x,cuoi,wherex());
+				break;
+			}
+			case 75:
+			{
+				NhapTen(kitu,nhap, x,cuoi,wherex());	
+				break;
+			}
+			case 77:
+			{
+				NhapTen(kitu,nhap, x,cuoi,wherex());	
+				break;
+			}
+			case -32:
+			{
+				kitu =getch();
+				if (kitu==LEFT)
+				{
+					if (wherex()>x)
+					{	
+						NhapMuiTen(kitu, nhap, x, wherex());
+						gotoxy(wherex()-1,wherey());
+					}
+					break;
+				}
+				if (kitu==RIGHT)
+				{
+					NhapMuiTen(kitu, nhap, x, wherex());
+					gotoxy(wherex()+1,wherey());
+					break;
+				}
+				if (kitu==UP)
+				{
+					break;
+				}
+				if (kitu==DOWN)
+				{
+					break;
+				}
+			}
+			case ESC:
+				return 0;
+			default:
+			{ 
+				hl=Hople(kitu,wherex(),wherey());
+				if (hl==true)
+					NhapTen(kitu,nhap, x,cuoi,wherex());
+				break;
+			}
+		}
+	}while(1);	
+}
+int Menu(PTR3 &p,char *nhap)
+{
+	int chon,dienten=0;
+	do
+  	{
+    	chon = MenuNgoai (menuNgoai,so_item);
+    	switch (chon)
+		{
+    		case 1: 
+			{
+				int chonDg;
+				do
+  				{
+    				chonDg = MenuNgoai (menuDocgia,so_itemDg);
+    				switch (chonDg)
+					{
+    					case 1: 
+						{
+							do
+							{
+								dienten=DienTen(p, nhap);
+							}while (dienten==1);
+							break;
+						}
+						case 2:
+						{
+							Normal();
+							system ("cls");
+							Inorder (p);
+							getch();
+							break;
+						}
+    					case 4: 
+						{
+							Menu(p,nhap);
+							return 0;
+						}
+						case 0: 
+						{
+							Menu(p, nhap);
+							return 0;
+						}
+   					}
+  				}while (1);
+  				break;
+			}
+    		case so_item: return 0;
+  		}
+	}while (1);
+}
+int main()
+{
+	fflush(stdin);
+	Normal ();
+	system ("cls");
+	char *nhap=NULL;
+	PTR3 p=NULL;
+	Menu(p,nhap);
+}
